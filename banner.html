@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <style>
+      video {
+        max-width: 100% !important;
+      }
+    </style>
+    <script>
+      window.onload = function () {
+        loadById(GetQueryString('id'))
+      }
+
+      function GetQueryString(name) {
+        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
+        var r = window.location.search.substr(1).match(reg) //获取url中"?"符后的字符串并正则匹配
+        var context = ''
+        if (r != null) context = decodeURIComponent(r[2])
+        reg = null
+        r = null
+        return context == null || context == '' || context == 'undefined' ? '' : context
+      }
+
+      function loadById(id) {
+        if (!id) return
+        let xhr = new XMLHttpRequest()
+        if (window.location.href.indexOf('10.10.10.') != -1) {
+          xhr.open('get', '/stage-api/match/matchBanner/' + id)
+          // xhr.open('get', 'http://10.10.10.25:5555/dev-api/match/matchNews/' + id)
+        } else {
+          xhr.open('get', '/prod-api/match/matchBanner/' + id)
+        }
+
+        xhr.send()
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            let resp = JSON.parse(xhr.responseText)
+            if (resp && resp.data) {
+              document.getElementById('newsContent').innerHTML = resp.data.content
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #ffffff;
+        /* color: #ffffff; */
+      }
+      .news {
+        text-align: center;
+        width: 90vw;
+        max-width: 100%;
+        margin: 0 auto;
+      }
+      .content {
+        margin: 10px;
+        text-align: left;
+      }
+      .content img {
+        max-width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="news">
+      <header>
+        <h1 id="newsTitle"></h1>
+      </header>
+      <div class="content" id="newsContent"></div>
+    </div>
+  </body>
+</html>
